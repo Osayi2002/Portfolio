@@ -3,10 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sri Lanka Economic Analysis (Python)</title>
+    <title>Sri Lanka Economic Analysis</title>
 </head>
 <body>
-    <h1>Sri Lanka Economic Analysis</h1>
-    <p>This project explores economic data for Sri Lanka, including GDP, inflation, and trade balances. Key visualizations compare Sri Lanka's performance to neighboring countries and global trade trends.</p>
+    <header>
+        <h1>Sri Lanka Economic Analysis</h1>
+    </header>
+    <main>
+        <section>
+            <h2>Overview</h2>
+            <p>This project explores economic data for Sri Lanka, focusing on GDP growth, inflation, public debt, and trade balances.</p>
+        </section>
+        <section>
+            <h2>Key Features</h2>
+            <ul>
+                <li>Comparison of Sri Lanka's economic performance with global trade metrics and neighboring South Asian countries.</li>
+                <li>Visualizations of GDP growth, inflation trends, and trade balance over time.</li>
+                <li>Interactive data exploration using Python and IPython widgets.</li>
+            </ul>
+        </section>
+        <section>
+            <h2>Project Code Highlights</h2>
+            <pre>
+# Load Data
+import pandas as pd
+from IPython.display import display
+
+# Data visualization
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Widgets for interactivity
+from ipywidgets import interact
+
+# Load Sri Lanka Economic Data from website
+url = "https://www.focus-economics.com/countries/sri-lanka/"
+tables = pd.read_html(url)
+df = tables[0]
+
+# Filter relevant indicators including Exports and Imports
+indicators = [
+    "Economic Growth (GDP, ann. var. %)", 
+    "Inflation (CCPI, ann. var. %, aop)", 
+    "Unemployment (% of active population, aop)", 
+    "Public Debt (% of GDP)", 
+    "Merchandise Trade Balance (USD bn)",
+    "Exports (G&S, ann. var. %)",
+    "Imports (G&S, ann. var. %)"
+]
+
+# Data cleaning and exploration
+filtered_data = df[df['Unnamed: 0'].isin(indicators)]
+filtered_data.columns = ['Indicator', '2019', '2020', '2021', '2022', '2023']
+filtered_data.set_index('Indicator', inplace=True)
+cleaned_data = filtered_data.transpose()
+
+print("Sri Lanka Data:")
+display(cleaned_data)
+
+# Visualization Example
+sns.lineplot(data=cleaned_data, x='Year', y='Economic Growth (GDP, ann. var. %)')
+plt.title("Sri Lanka GDP Growth Over Time")
+plt.show()
+            </pre>
+        </section>
+        <section>
+            <h2>Conclusion</h2>
+            <p>The analysis highlights challenges like inflation and trade deficits while showcasing how Sri Lanka's economic performance compares to regional and global trends. Recommendations include bolstering export efforts and implementing fiscal policies to address public debt and inflation.</p>
+        </section>
+    </main>
 </body>
 </html>
