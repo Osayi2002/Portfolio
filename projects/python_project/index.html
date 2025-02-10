@@ -4,39 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sri Lanka Economic Analysis</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #4682b4;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        section {
+            background: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        pre {
+            background-color: #2d2d2d;
+            color: #ffffff;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        iframe {
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+            max-width: 100%;
+        }
+        a {
+            color: #007BFF;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
+
     <header>
         <h1>Sri Lanka Economic Analysis</h1>
+        <p>Exploring Sri Lanka's economic performance through data analysis and visualization.</p>
     </header>
-    <main>
-        <section>
-            <h2>Overview</h2>
-            <p>This project explores economic data for Sri Lanka, focusing on GDP growth, inflation, public debt, and trade balances.</p>
-        </section>
-        <section>
-            <h2>Key Features</h2>
-            <ul>
-                <li>Comparison of Sri Lanka's economic performance with global trade metrics and neighboring South Asian countries.</li>
-                <li>Visualizations of GDP growth, inflation trends, and trade balance over time.</li>
-                <li>Interactive data exploration using Python and IPython widgets.</li>
-            </ul>
-        </section>
-        <section>
-            <h2>Project Code Highlights</h2>
-            <pre>
-# Load Data
+
+    <!-- Introduction Section -->
+    <section id="introduction">
+        <h2>Introduction</h2>
+        <p>
+            This project analyzes Sri Lanka's economic indicators, including GDP growth, inflation, unemployment,
+            public debt, and trade balance. The data is processed and visualized using Python and pandas, with
+            interactive plots to explore trends and comparisons with global trade and neighboring South Asian countries.
+        </p>
+    </section>
+
+    <!-- Raw Code Section -->
+    <section id="raw-code">
+        <h2>Project Code</h2>
+        <pre><code class="language-python">
+### Section 1: Load and Clean Data
 import pandas as pd
 from IPython.display import display
 
-# Data visualization
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# Widgets for interactivity
-from ipywidgets import interact
-
-# Load Sri Lanka Economic Data from website
+# Load Sri Lanka Economic Data from Website
 url = "https://www.focus-economics.com/countries/sri-lanka/"
 tables = pd.read_html(url)
 df = tables[0]
@@ -52,25 +89,56 @@ indicators = [
     "Imports (G&S, ann. var. %)"
 ]
 
-# Data cleaning and exploration
+# Filter and clean the data
 filtered_data = df[df['Unnamed: 0'].isin(indicators)]
 filtered_data.columns = ['Indicator', '2019', '2020', '2021', '2022', '2023']
 filtered_data.set_index('Indicator', inplace=True)
 cleaned_data = filtered_data.transpose()
 
-print("Sri Lanka Data:")
-display(cleaned_data)
+# Reset Index to prepare the dataframe for use in visualizations
+sri_lanka_data = cleaned_data.reset_index()
+sri_lanka_data.rename(columns={"index": "Year"}, inplace=True)
 
-# Visualization Example
-sns.lineplot(data=cleaned_data, x='Year', y='Economic Growth (GDP, ann. var. %)')
-plt.title("Sri Lanka GDP Growth Over Time")
-plt.show()
-            </pre>
-        </section>
-        <section>
-            <h2>Conclusion</h2>
-            <p>The analysis highlights challenges like inflation and trade deficits while showcasing how Sri Lanka's economic performance compares to regional and global trends. Recommendations include bolstering export efforts and implementing fiscal policies to address public debt and inflation.</p>
-        </section>
-    </main>
+# Manually Input Global Trade Data
+global_trade_data = pd.DataFrame({
+    "Year": [2019, 2020, 2021, 2022, 2023] * 2,
+    "Category": ["World"] * 5 + ["Emerging Economies"] * 5,
+    "Exports (USD Billions)": [19000, 17000, 22000, 23000, 24000, 8000, 7200, 9000, 9500, 10000],
+    "Imports (USD Billions)": [18900, 16800, 21900, 22900, 23900, 7800, 7000, 8800, 9300, 9800]
+})
+
+# Display Summary
+print("Sri Lanka Data:")
+display(sri_lanka_data)
+        </code></pre>
+        <p>View the full project on GitHub: <a href="https://github.com/Osayi2002/Portfolio" target="_blank">Sri Lanka Economic Analysis Repository</a></p>
+    </section>
+
+    <!-- Interactive Showcase Section -->
+    <section id="interactive">
+        <h2>Interactive Showcase</h2>
+        <p>Watch this video to see the project in action:</p>
+
+        <!-- Embedded Video -->
+        <iframe 
+            width="560" 
+            height="315" 
+            src="https://video.syr.edu/media/t/1_h00e6jxl" 
+            title="Sri Lanka Economic Analysis Video" 
+            frameborder="0" 
+            allowfullscreen>
+        </iframe>
+
+        <p>If the video does not load, you can watch it directly here: 
+            <a href="https://video.syr.edu/media/t/1_h00e6jxl" target="_blank">Watch the Video</a>
+        </p>
+
+        <h3>Try it Yourself</h3>
+        <p>Run the Python notebook interactively using Binder:</p>
+        <a href="https://mybinder.org/v2/gh/Osayi2002/Portfolio/main?filepath=projects/python_project/notebook.ipynb" target="_blank">
+            <button>Run on Binder</button>
+        </a>
+    </section>
+
 </body>
 </html>
