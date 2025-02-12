@@ -86,63 +86,325 @@
             <h2>R Project Code</h2>
             <p>The following code was used to conduct data analysis on the service request dataset:</p>
             <pre>
-# Load Required Libraries
+#when i gave you this i wanted you to include all the comments in the index file: this is the orignal r project code: #1. Load and Explore the Data
+
+#install.packages(“tidyverse”)
 library(tidyverse)
 library(readr)
 url <- "https://data-science-intro.s3.us-east-2.amazonaws.com/SYRCityline_Requests.csv"
 data <- read_csv(url)
 head(data)
+str(data)
 summary(data)
+colnames(data)
+nrow(data)
+ncol(data)
+#The dataset contains 60208 rows (observations) and 21 columns (variables)
 colSums(is.na(data))
+sum(is.na(data)) #the dataset contains 9219 missing values
 
-# Handle Missing Values
+{r}
+#2. Handle Missing Values 
+colSums(is.na(data)) #identifies missing values and where they occur/how many are present 
+
 for (col in names(data)) {
   if (is.character(data[[col]])) {
+    # Replace missing values in character columns with "unknown"
     data[[col]][is.na(data[[col]])] <- "unknown"
   } else if (is.numeric(data[[col]])) {
+    # Replace missing values in numeric columns with 0
     data[[col]][is.na(data[[col]])] <- 0
   }
 }
+colSums(is.na(data)) #confirms the changes to missing values
 
-# Analyze Categorical Variables
+{r}
+#3. Analyze Categorical Variables
+
+# Analyze the categorical variables Agency_Name and Category (category is the type of request being reported)
+# creates frequency tables for Agency_Name and Category
 freq_table1 <- table(data$Agency_Name)
 freq_table2 <- table(data$Category)
 
-# Visualize Ratings with a Boxplot
+# shows the frequency tables
+freq_table1
+freq_table2
+
+# Counts the number of different agencies
+num_agencies <- length(unique(data$Agency_Name))
+print(num_agencies) # shows the total number of agencies
+
+# Finds the most frequent category in each Agency_Name and Category
+max_category1 <- names(which.max(freq_table1))
+max_freq1 <- max(freq_table1)
+max_category2 <- names(which.max(freq_table2))
+max_freq2 <- max(freq_table2)
+
+#Display insights
+print(max_category1) # Most frequent agency
+print(max_freq1) # Frequency of the most frequent agency
+print(max_category2) # Most frequent category
+print(max_freq2) # Frequency of the most frequent category
+
+#Key insights from analyzing:
+# Based on the data there seems to be significant amount of requests coming from very few categories which shows an uneven distribution
+# There are 10 different agencies. 'Garbage, Recycling & Graffiti' agency takes care of 26,337 requests which is the most out of all the agencies. The 'Water & Sewage' agency comes in 2nd taking care of 14,614 requests, and the 'Streets, Sidewalks & transportation' agency comes in 3rd taking care of 6807 requests. 
+# 'Sewer Back-ups (INTERNAL)' is the most frequent category reported at 11,270, which indicates that there are repeated problems with the sewage systems
+# 'Illegal Setouts' and 'Weekly Trash Pick up' are at 6995 and 6628 reports respectively, highlighting other major areas of public concern
+
+{r}
+#4. Visualize Ratings with a Boxplot
+
 ggplot(data, aes(x = factor(Sla_in_hours), y = Rating)) +
   geom_boxplot(fill = "skyblue", color = "black") +
-  labs(title = "Boxplot of Ratings by SLA Hours", x = "SLA in Hours", y = "Rating") +
-  theme_minimal()
+  labs(
+    title = "Boxplot of Ratings Grouped by SLA in Hours",
+    x = "SLA in Hours",
+    y = "Rating"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+#The boxplot shows the relationship between SLA in hours and customer ratings. While the 72-hour SLA group has sufficient data to form a full boxplot, other SLA groups are represented by individual points due to fewer data points. For the 72-hour group, ratings are moderately consistent, with most values falling between 2 and 3. In contrast, longer SLA times appear to correlate with consistently low ratings, suggesting a potential dissatisfaction with extended resolution times. Shorter SLA times exhibit higher variability, as seen in isolated ratings that range from 2 to 6. There are also many outliers in this dataset. There are higher ratings for shorter service response times.
 
-# Requests by ZIP Code
+{r}
+#5. Visualize Trends Over Time
+
+library(lubridate)
+library(dplyr)
+library(ggplot2)
+# Parse the 'Created_at_local' column into a standardized datetime format
+# Supports multiple potential formats (e.g., "ymd HMS", "mdy IMp", etc.)
+data$datetime_column <- parse_date_time(
+  data$Created_at_local, 
+  orders = c("ymd HMS", "mdy IMp", "mdy", "ymd")
+)
+
+# Replace missing values in the 'datetime_column' with a default datetime value
+default_datetime <- as.POSIXct("2024-01-01 00:00:00")
+data$datetime_column[is.na(data$datetime_column)] <- default_datetime
+
+# Format the datetime column as a string in "YYYY-MM-DD HH:MM:SS" format
+data$cr <- format(data$datetime_column, "%Y-%m-%d %H:%M:%S")
+
+# Extract the year and month for grouping purposes
+data$year_month <- format(data$datetime_column, "%Y-%m")
+
+# Summarize the total requests across all request types for each month
+grouped_data <- data %>%
+  group_by(year_month, Request_type) %>%
+  summarise(
+    request_count = n(), 
+    .groups = "drop" )
+
+# Aggregate the total number of requests per month
+aggregated_data <- grouped_data %>%
+  group_by(year_month) %>%
+  summarise(
+    total_requests = sum(request_count), 
+    .groups = "drop")
+
+# Create a line plot to visualize the total number of requests over time
+ggplot(aggregated_data, aes(x = year_month, y = total_requests, group = 1)) +
+  geom_line(color = "steelblue") +
+  labs(title = "Total Service Requests Over Time",
+       x = "Date",
+       y = "Number of Requests") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Interpret the plot: The number of requests have increased over time. We can see that the number of requests typically increase the most in September each year and then decrease around December and January. The increase during September might be because of students going back to school. It most likely decreases during December and January due to reduced activity because of holiday times.
+
+{r}
+#6. Requests by Zip Code
+
 library(stringr)
 data$ZIP <- str_extract(data$Address, "\\b13\\d{3}\\b")
+data <- na.omit(data)
+# The str_extract() function extracts ZIP codes from the Address column that match the pattern of a 5-digit number starting with 13. The na.omit() function removes rows with NA values in the ZIP column, ensuring clean data.
+# Create a bar chart for the frequency of requests by ZIP code
 ggplot(data = data, aes(x = ZIP)) +
   geom_bar(fill = "blue", color = "black") +
   theme_minimal() +
-  labs(title = "Frequency of Requests by ZIP Code", x = "ZIP Code", y = "Number of Requests")
+  labs(title = "Frequency of Requests by ZIP Code",
+       x = "ZIP Code",
+       y = "Number of Requests") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+#Identifying the Zip code with the highest number of requests
+top_zip <- data %>%
+  count(ZIP) %>%
+  arrange(desc(n)) %>%
+  slice(1)
+# Display the result
+print(top_zip)
+#The zip code with the highest number of requests is 13204 with 8739 requests.
 
-# Regression Analysis
-lm_model <- lm(Minutes_to_closed ~ High_Rating + Sla_in_hours + Report_Mobile, data = data)
-summary(lm_model)
+{r}
+#7. Create a Map of Syracuse Service Requests
 
-# Association Rules Mining
+#install.packages("ggplot2")
+#install.packages("ggmap")
+#install.packages("sf")
+#install.packages("tigris")
+#install.packages("dplyr")
+library(dplyr)
+library(ggplot2)
+library(ggmap)
+library(sf)
+library(tigris)
+# Get city boundaries for New York state
+ny_cities <- places(state = "NY", cb = TRUE)
+# Filter for Syracuse
+syracuse_boundary <- ny_cities %>% filter(NAME == "Syracuse")
+# Create base map
+city_map <- ggplot() +
+  geom_sf(data = syracuse_boundary, fill = "white", color = "black") +
+  coord_sf() +
+  ggtitle("City of Syracuse Service Requests") +
+  theme_minimal()
+
+# Add scatterplot of service requests, colored by Rating
+city_map <- city_map +
+  geom_point(data = data, aes(x = Lng, y = Lat, color = Rating), alpha = 0.6, size = 2) +
+  scale_color_viridis_c() + # Use a color scale for Rating
+  labs(color = "Rating") +
+  theme(legend.position = "bottom")
+# Display the map
+print(city_map)
+
+{r}
+#8. Create New Variables
+
+data$Rating <- as.numeric(as.character(data$Rating))
+data$High_Rating <- ifelse(data$Rating >= 3, 1, 0)
+data$Report_Mobile <- ifelse(data$Report_Source %in% c("Android", "iPhone", "Request – Mobile"), 1, 0)
+table(data$High_Rating)
+table(data$Report_Mobile)
+#Explanation
+# High_Rating Variable: Uses the ifelse command to check if the Rating column has a value greater than or equal to 3. When it is run it will assign 1 if the condition is true and 0 if false.
+#Report_Mobile Variable: Also uses the ifelse command combined with %in% (a pipe) to check if Report_Source matches any of the specified values: "Android", "iPhone", or "Request – Mobile". The once ran it assigns 1 if a match is found and 0 for false.
+
+{r}
+#9. Association Rules Mining
+
+#install.packages("arules")
 library(arules)
+data <- as.data.frame(data)
+data[] <- lapply(data, as.factor)
 transactions <- as(data, "transactions")
-rules <- apriori(transactions, parameter = list(supp = 0.01, conf = 0.5, minlen = 2))
+# This is converting relevant variables to factors
+# Now I apply the algorithm
+rules <- apriori(
+  transactions,
+  parameter = list(supp = 0.01, conf = 0.5, minlen = 2),
+  appearance = list(rhs = c("High_Rating=1"), default = "lhs")
+)
 inspect(head(rules, 10))
+# The function that I used essentially generates rules with three key metrics and those are the proportion of transactions in which the items appear. The likelihood that the rule holds true and the ratio of the observed support to the expected support if the items were independent. When I inspect the rules on the first 10 outputs I see high confidence. Many of the rules have very high confidence, meaning that if the condition on the LHS is true, the RHS (High_Rating=1) will always be true. The support values vary, but some rules have relatively higher support, meaning they are more common across the dataset. 
 
-# Text Mining
+{r}
+# 10. Regression Analysis
+# creates the linear regression model
+lm_model <- lm(Minutes_to_closed ~ High_Rating + Sla_in_hours + Report_Mobile, data = data)
+
+# Ensures all variables in model are numeric and do not have factor levels
+str(data$Minutes_to_closed)
+str(data$High_Rating)
+str(data$Sla_in_hours)
+str(data$Report_Mobile)
+data$Minutes_to_closed <- as.numeric(as.character(data$Minutes_to_closed))
+data$High_Rating <- as.numeric(as.character(data$High_Rating))
+data$Sla_in_hours <- as.numeric(as.character(data$Sla_in_hours))
+data$Report_Mobile <- as.numeric(as.character(data$Report_Mobile))
+
+colSums(is.na(data[, c("Minutes_to_closed", "High_Rating", "Sla_in_hours", "Report_Mobile")]))
+
+# Views the summary of the regression model
+model_summary <- summary(lm_model)
+print(model_summary)
+
+# Visualizes the regression model
+library(ggplot2)
+
+ggplot(data, aes(x = Sla_in_hours, y = Minutes_to_closed)) +
+  geom_point(alpha = 0.5, color = "blue") +  # Scatterplot
+  geom_smooth(method = "lm", color = "red", se = TRUE) +  # Regression line
+  labs(
+    title = "Relationship Between SLA in Hours and Minutes to Closed",
+    x = "SLA in Hours",
+    y = "Minutes to Closed"
+  ) +
+  theme_minimal()
+
+#Model explanation:
+# High_Rating and Sla_in_hours are statistically significant because p<0.001. Report_Mobile is not significant with a p value of 0.795
+# High_Rating increases Minutes_to_closed by 8263 minutes and every additional hour in Sla_in_hours increases Minutes_to_closed by 25.68 minutes
+
+#Overall Model Fit:
+# The R-squared is 4.28% of the variation in Minutes_to_closed is caused by the model, showing a weak relationship
+# The residual standard error is 28420 which indicates a high variability
+
+# Visualization insights:
+# The regression line is almost flat which further emphasizes there is a weak relationship between SLA in Hours and Minutes_to_closed
+# The data is concentrated around low SLA values with a large variability and some outliers
+
+{r}
+# 11. Text Mining
+library(tidyverse)
+#install.packages(quanteda)
 library(quanteda)
+#install.packages(quanteda.textplots)
+library(quanteda.textplots)
+
+# Changes the structure of the column name as character
+data$Summary <- as.character(data$Summary)
+
+#analyzing  summary variable and transforms the column into a document-feature matrix (removes stop words and cleans data)
 summary_corpus <- corpus(data$Summary)
-summary_dfm <- dfm(tokens_select(tokens(summary_corpus), stopwords("en"), selection = "remove"))
-textplot_wordcloud(summary_dfm, min_count = 2)
+summary_tokens <- tokens (summary_corpus)
+summary_tokens_clean <- tokens_select(summary_tokens, stopwords("en"), selection = "remove")
+summary_dfm <- dfm(summary_tokens_clean)
+
+# Changes the structure of the column name as character
+data$Description <- as.character(data$Description)
+
+#analyzing the description variables
+description_corpus <- corpus(data$Description)
+description_tokens <-  tokens(description_corpus) 
+description_tokens_clean <- tokens_select(description_tokens, stopwords("en"), selection = "remove")
+description_dfm <- dfm(description_tokens_clean)
+
+#visualization in word cloud
+textplot_wordcloud(description_dfm, min_count = 1)
+textplot_wordcloud(summary_dfm, min_count = 1)
+{r}
+#12. Summarize Findings
+# Objective: 
+#The goal of this project code was to analyze service request data from the City of Syracuse. 
+This data reveals the trends seen in the city, as well as examining the process of the services, and working to enhance them. 
+
+#Key Findings: 
+#There were 60,208 observations about the data collected as well as some missing values, which were marked as “unknown”.  
+There is a trend in data showing that peak service request season starts in September and decreases during the holiday season throughout December and January. 
+
+#Category Analysis: 
+#The Garbage, Recycling, and Grafiti agency handled the majority of requests at over 26,000 requests. Additionally, 
+the Water and Sewage agency handled almost 15,000 requests, and Streets, Sidewalks, and Transportation weighed in on nearly 7,000 requests. 
+
+#Spatial Insights: 
+#Certain areas made more service requests than others, creating space in the data. 
+Higher clusters of data in the zip code area 13204 where the most service requests were placed. 
+
+#Regression Analysis: 
+#High Rating and Sla in hours are statistically significant because p<0.001. Report Mobile is not significant with a p value of 0.795
+
+#Conclusion: 
+#With shorter SLA times come higher ratings for the city of Syracuse. This is one goal that the city should have in order to keep increasing ratings.
             </pre>
         </section>
 
         <section>
             <h2>Interactive Shiny App</h2>
-            <p>You can explore the interactive version of this analysis here:</p>
+            <p>You can explore a shorter interactive version of this analysis here:</p>
             <p><a href="https://osayi2002.shinyapps.io/shinyapp/" target="_blank">🔗 Syracuse Service Requests Shiny App</a></p>
         </section>
     </main>
