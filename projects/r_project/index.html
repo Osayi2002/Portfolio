@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Syracuse Service Requests Analysis</title>
+    <title>Syracuse Service Requests Analysis (R)</title>
     <style>
         /* General Page Styling */
         body {
@@ -64,7 +64,8 @@
 </head>
 <body>
     <header>
-        <h1>Syracuse Service Requests Analysis</h1>
+        <h1>Syracuse Service Requests Analysis (R)</h1>
+        <p><i>Analyzing and visualizing trends in service requests to improve city services.</i></p>
     </header>
     
     <main>
@@ -86,7 +87,7 @@
             <h2>R Project Code</h2>
             <p>The following code was used to conduct data analysis on the service request dataset:</p>
             <pre>
-#when i gave you this i wanted you to include all the comments in the index file: this is the orignal r project code: #1. Load and Explore the Data
+#1. Load and Explore the Data
 
 #install.packages(“tidyverse”)
 library(tidyverse)
@@ -103,7 +104,6 @@ ncol(data)
 colSums(is.na(data))
 sum(is.na(data)) #the dataset contains 9219 missing values
 
-{r}
 #2. Handle Missing Values 
 colSums(is.na(data)) #identifies missing values and where they occur/how many are present 
 
@@ -118,7 +118,6 @@ for (col in names(data)) {
 }
 colSums(is.na(data)) #confirms the changes to missing values
 
-{r}
 #3. Analyze Categorical Variables
 
 # Analyze the categorical variables Agency_Name and Category (category is the type of request being reported)
@@ -152,7 +151,6 @@ print(max_freq2) # Frequency of the most frequent category
 # 'Sewer Back-ups (INTERNAL)' is the most frequent category reported at 11,270, which indicates that there are repeated problems with the sewage systems
 # 'Illegal Setouts' and 'Weekly Trash Pick up' are at 6995 and 6628 reports respectively, highlighting other major areas of public concern
 
-{r}
 #4. Visualize Ratings with a Boxplot
 
 ggplot(data, aes(x = factor(Sla_in_hours), y = Rating)) +
@@ -166,7 +164,6 @@ ggplot(data, aes(x = factor(Sla_in_hours), y = Rating)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 #The boxplot shows the relationship between SLA in hours and customer ratings. While the 72-hour SLA group has sufficient data to form a full boxplot, other SLA groups are represented by individual points due to fewer data points. For the 72-hour group, ratings are moderately consistent, with most values falling between 2 and 3. In contrast, longer SLA times appear to correlate with consistently low ratings, suggesting a potential dissatisfaction with extended resolution times. Shorter SLA times exhibit higher variability, as seen in isolated ratings that range from 2 to 6. There are also many outliers in this dataset. There are higher ratings for shorter service response times.
 
-{r}
 #5. Visualize Trends Over Time
 
 library(lubridate)
@@ -214,7 +211,6 @@ ggplot(aggregated_data, aes(x = year_month, y = total_requests, group = 1)) +
 
 # Interpret the plot: The number of requests have increased over time. We can see that the number of requests typically increase the most in September each year and then decrease around December and January. The increase during September might be because of students going back to school. It most likely decreases during December and January due to reduced activity because of holiday times.
 
-{r}
 #6. Requests by Zip Code
 
 library(stringr)
@@ -238,7 +234,6 @@ top_zip <- data %>%
 print(top_zip)
 #The zip code with the highest number of requests is 13204 with 8739 requests.
 
-{r}
 #7. Create a Map of Syracuse Service Requests
 
 #install.packages("ggplot2")
@@ -271,7 +266,6 @@ city_map <- city_map +
 # Display the map
 print(city_map)
 
-{r}
 #8. Create New Variables
 
 data$Rating <- as.numeric(as.character(data$Rating))
@@ -283,7 +277,6 @@ table(data$Report_Mobile)
 # High_Rating Variable: Uses the ifelse command to check if the Rating column has a value greater than or equal to 3. When it is run it will assign 1 if the condition is true and 0 if false.
 #Report_Mobile Variable: Also uses the ifelse command combined with %in% (a pipe) to check if Report_Source matches any of the specified values: "Android", "iPhone", or "Request – Mobile". The once ran it assigns 1 if a match is found and 0 for false.
 
-{r}
 #9. Association Rules Mining
 
 #install.packages("arules")
@@ -301,7 +294,6 @@ rules <- apriori(
 inspect(head(rules, 10))
 # The function that I used essentially generates rules with three key metrics and those are the proportion of transactions in which the items appear. The likelihood that the rule holds true and the ratio of the observed support to the expected support if the items were independent. When I inspect the rules on the first 10 outputs I see high confidence. Many of the rules have very high confidence, meaning that if the condition on the LHS is true, the RHS (High_Rating=1) will always be true. The support values vary, but some rules have relatively higher support, meaning they are more common across the dataset. 
 
-{r}
 # 10. Regression Analysis
 # creates the linear regression model
 lm_model <- lm(Minutes_to_closed ~ High_Rating + Sla_in_hours + Report_Mobile, data = data)
@@ -347,7 +339,6 @@ ggplot(data, aes(x = Sla_in_hours, y = Minutes_to_closed)) +
 # The regression line is almost flat which further emphasizes there is a weak relationship between SLA in Hours and Minutes_to_closed
 # The data is concentrated around low SLA values with a large variability and some outliers
 
-{r}
 # 11. Text Mining
 library(tidyverse)
 #install.packages(quanteda)
@@ -376,7 +367,7 @@ description_dfm <- dfm(description_tokens_clean)
 #visualization in word cloud
 textplot_wordcloud(description_dfm, min_count = 1)
 textplot_wordcloud(summary_dfm, min_count = 1)
-{r}
+
 #12. Summarize Findings
 # Objective: 
 #The goal of this project code was to analyze service request data from the City of Syracuse. 
@@ -387,18 +378,20 @@ This data reveals the trends seen in the city, as well as examining the process 
 There is a trend in data showing that peak service request season starts in September and decreases during the holiday season throughout December and January. 
 
 #Category Analysis: 
-#The Garbage, Recycling, and Grafiti agency handled the majority of requests at over 26,000 requests. Additionally, 
-the Water and Sewage agency handled almost 15,000 requests, and Streets, Sidewalks, and Transportation weighed in on nearly 7,000 requests. 
+#The Garbage, Recycling, and Grafiti agency handled the majority of requests at over 26,000 requests. 
+Additionally, the Water and Sewage agency handled almost 15,000 requests, and Streets, Sidewalks, and Transportation weighed in on nearly 7,000 requests. 
 
 #Spatial Insights: 
 #Certain areas made more service requests than others, creating space in the data. 
 Higher clusters of data in the zip code area 13204 where the most service requests were placed. 
 
 #Regression Analysis: 
-#High Rating and Sla in hours are statistically significant because p<0.001. Report Mobile is not significant with a p value of 0.795
+#High Rating and Sla in hours are statistically significant because p<0.001. 
+Report Mobile is not significant with a p value of 0.795
 
 #Conclusion: 
-#With shorter SLA times come higher ratings for the city of Syracuse. This is one goal that the city should have in order to keep increasing ratings.
+#With shorter SLA times come higher ratings for the city of Syracuse. 
+This is one goal that the city should have in order to keep increasing ratings. 
             </pre>
         </section>
 
