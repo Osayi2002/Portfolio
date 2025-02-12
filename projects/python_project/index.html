@@ -107,9 +107,168 @@ global_trade_data = pd.DataFrame({
     "Imports (USD Billions)": [18900, 16800, 21900, 22900, 23900, 7800, 7000, 8800, 9300, 9800]
 })
 
-# Display Summary
+# Neighboring Countries Data
+neighbors_data = pd.DataFrame({
+    "Year": [2019, 2020, 2021, 2022, 2023],
+    "South Asia": [4.1, -4.5, 7.9, 6.1, 5.5],
+    "India": [3.7, -6.6, 8.7, 6.9, 6.6],
+    "Pakistan": [3.1, -0.9, 5.7, 6.0, 2.0],
+    "Bangladesh": [7.9, 3.4, 6.9, 7.2, 5.2]
+})
+
+# Display Datasets
 print("Sri Lanka Data:")
 display(sri_lanka_data)
+
+print("Global Trade Data:")
+display(global_trade_data)
+
+print("Neighboring Countries Data:")
+display(neighbors_data)
+
+### Section 2: Summary Statistics
+from ipywidgets import interact_manual
+
+# Display Sri Lanka Data Summary
+print("Summary of Sri Lanka Data:")
+display(sri_lanka_data.describe())
+
+# Interactive selection to display summaries for global trade or neighboring countries
+@interact_manual(dataset=["Global Trade Data", "Neighboring Countries Data"])
+def dataset_summary(dataset):
+    if dataset == "Global Trade Data":
+        print("Summary of Global Trade Data:")
+        display(global_trade_data.describe())
+    elif dataset == "Neighboring Countries Data":
+        print("Summary of Neighboring Countries Data:")
+        display(neighbors_data.describe())
+
+### Section 3: Analysis
+# Display Sri Lanka GDP Data
+sri_lanka_gdp_data = sri_lanka_data[["Year", "Economic Growth (GDP, ann. var. %)"]]
+print("Sri Lanka GDP Data (2019-2023):")
+display(sri_lanka_gdp_data)
+
+# Dropdown menu for selecting datasets to analyze
+@interact_manual(
+    dataset=["Neighboring Countries", "Global Trade"]
+)
+def analyze_data(dataset):
+    if dataset == "Neighboring Countries":
+        print("Neighboring Countries GDP Growth (2019-2023):")
+        display(neighbors_data)
+    elif dataset == "Global Trade":
+        print("Global Trade Data (Exports and Imports, 2019-2023):")
+        display(global_trade_data)
+
+### Section 4: Data Visualization
+import matplotlib.pyplot as plt
+import seaborn as sns
+from ipywidgets import interact
+
+# Visualization 1: Sri Lanka vs Neighboring Countries (GDP Growth)
+@interact(country=["South Asia", "India", "Pakistan", "Bangladesh"])
+def gdp_comparison(country):
+    plt.figure(figsize=(12, 6))
+    sns.lineplot(data=sri_lanka_data, x="Year", y="Economic Growth (GDP, ann. var. %)", label="Sri Lanka", marker="o", color="blue")
+    sns.lineplot(data=neighbors_data, x="Year", y=country, label=country, marker="o", color="orange")
+    plt.title(f"GDP Growth Comparison: Sri Lanka vs {country} (2019-2023)")
+    plt.xlabel("Year")
+    plt.ylabel("GDP Growth (%)")
+    plt.legend()
+    plt.show()
+
+# Visualization 2: Sri Lanka vs Neighboring Countries (Inflation)
+@interact(country=["South Asia", "India", "Pakistan", "Bangladesh"])
+def inflation_comparison(country):
+    plt.figure(figsize=(12, 6))
+    sns.lineplot(data=sri_lanka_data, x="Year", y="Inflation (CCPI, ann. var. %, aop)", label="Sri Lanka", marker="o", color="blue")
+    sns.lineplot(data=neighbors_data, x="Year", y=country, label=country, marker="o", color="red")
+    plt.title(f"Inflation Comparison: Sri Lanka vs {country} (2019-2023)")
+    plt.xlabel("Year")
+    plt.ylabel("Inflation Rate (%)")
+    plt.legend()
+    plt.show()
+    
+# Visualization 3: Sri Lanka vs Global Trade Metrics - Exports
+@interact(category=["World", "Emerging Economies"])
+def export_comparison(category):
+    plt.figure(figsize=(12, 6))
+    sns.lineplot(data=sri_lanka_data, x="Year", y="Exports (G&S, ann. var. %)", label="Sri Lanka", marker="o", color="blue")
+    sns.lineplot(data=global_trade_data[global_trade_data["Category"] == category], x="Year", y="Exports (USD Billions)", label=category, marker="o", color="green")
+    plt.title(f"Exports Comparison: Sri Lanka vs {category} (2019-2023)")
+    plt.xlabel("Year")
+    plt.ylabel("Exports (USD Billions)")
+    plt.legend()
+    plt.show()
+
+# Visualization 4: Sri Lanka vs Global Trade Metrics - Imports
+@interact(category=["World", "Emerging Economies"])
+def import_comparison(category):
+    plt.figure(figsize=(12, 6))
+    sns.lineplot(data=sri_lanka_data, x="Year", y="Imports (G&S, ann. var. %)", label="Sri Lanka", marker="o", color="blue")
+    sns.lineplot(data=global_trade_data[global_trade_data["Category"] == category], x="Year", y="Imports (USD Billions)", label=category, marker="o", color="purple")
+    plt.title(f"Imports Comparison: Sri Lanka vs {category} (2019-2023)")
+    plt.xlabel("Year")
+    plt.ylabel("Imports (USD Billions)")
+    plt.legend()
+    plt.show()
+
+# Visualization 5: Sri Lanka Unemployment Rate Over Time
+def unemployment_trends():
+    plt.figure(figsize=(12, 6))
+    sns.lineplot(data=sri_lanka_data, x="Year", y="Unemployment (% of active population, aop)", marker="o", color="orange")
+    plt.title("Sri Lanka Unemployment Rate (2019-2023)")
+    plt.xlabel("Year")
+    plt.ylabel("Unemployment Rate (%)")
+    plt.show()
+
+unemployment_trends()
+
+# Visualization 6: Sri Lanka Public Debt Over Time
+def public_debt_trends():
+    plt.figure(figsize=(12, 6))
+    sns.barplot(data=sri_lanka_data, x="Year", y="Public Debt (% of GDP)", color="purple")
+    plt.title("Sri Lanka Public Debt (% of GDP) (2019-2023)")
+    plt.xlabel("Year")
+    plt.ylabel("Public Debt (% of GDP)")
+    plt.show()
+
+public_debt_trends()
+
+# Visualization 7: Sri Lanka GDP vs Inflation
+def gdp_inflation_comparison():
+    plt.figure(figsize=(12, 6))
+    sns.lineplot(data=sri_lanka_data, x="Year", y="Economic Growth (GDP, ann. var. %)", label="GDP Growth", marker="o", color="blue")
+    sns.lineplot(data=sri_lanka_data, x="Year", y="Inflation (CCPI, ann. var. %, aop)", label="Inflation", marker="o", color="orange")
+    plt.title("Sri Lanka GDP Growth vs Inflation (2019-2023)")
+    plt.xlabel("Year")
+    plt.ylabel("Percentage (%)")
+    plt.legend()
+    plt.show()
+
+gdp_inflation_comparison()
+
+# Visualization 8: Sri Lanka Trade Balance Over Time
+plt.figure(figsize=(10, 6))
+sns.lineplot(data=sri_lanka_data, x="Year", y="Merchandise Trade Balance (USD bn)", marker="o", color="red", label="Trade Balance")
+plt.title("Sri Lanka Trade Balance Over Time (2019-2023)")
+plt.xlabel("Year")
+plt.ylabel("Trade Balance (USD bn)")
+plt.legend()
+plt.show()
+
+### Section 5: Insights
+1. **GDP and Inflation**: Sri Lanka experienced significant fluctuations in GDP growth, with sharp declines in 2020 followed by gradual recovery. Inflation remained persistently high, particularly in 2022.
+
+2. **Unemployment and Debt**: Unemployment trends remained relatively stable, but public debt rose significantly, signaling potential fiscal challenges.
+
+3. **Trade Metrics**: Sri Lanka's exports and imports varied significantly, with trade balance consistently negative, reflecting structural trade deficits.
+
+4. **Policy Recommendations**: Focus on addressing trade imbalances through export promotion and prudent fiscal policies (expansionary or contractionary based on economic conditions).
+
+5. **Comparison Insights**: Neighboring countries showed more stable GDP growth and inflation, highlighting Sri Lanka's unique challenges in regional and global contexts.
+
         </code></pre>
         <p>View the full project on GitHub: <a href="https://github.com/Osayi2002/Portfolio" target="_blank">Sri Lanka Economic Analysis Repository</a></p>
     </section>
