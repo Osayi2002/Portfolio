@@ -9,11 +9,13 @@
     <header>
         <h1>Syracuse Service Requests Analysis</h1>
     </header>
+    
     <main>
         <section>
             <h2>Overview</h2>
             <p>This project analyzes service request data from the City of Syracuse to identify trends and improve city services.</p>
         </section>
+
         <section>
             <h2>Key Features</h2>
             <ul>
@@ -22,9 +24,69 @@
                 <li>Visualizations showing trends over time and spatial analysis using maps.</li>
             </ul>
         </section>
+
         <section>
-            <h2>Conclusion</h2>
-            <p>The project reveals service requests trends, emphasizing the importance of improving SLA times to increase ratings.</p>
+            <h2>R Project Code</h2>
+            <p>The following code was used to conduct data analysis on the service request dataset:</p>
+            <pre>
+# Load Required Libraries
+library(tidyverse)
+library(readr)
+url <- "https://data-science-intro.s3.us-east-2.amazonaws.com/SYRCityline_Requests.csv"
+data <- read_csv(url)
+head(data)
+summary(data)
+colSums(is.na(data))
+
+# Handle Missing Values
+for (col in names(data)) {
+  if (is.character(data[[col]])) {
+    data[[col]][is.na(data[[col]])] <- "unknown"
+  } else if (is.numeric(data[[col]])) {
+    data[[col]][is.na(data[[col]])] <- 0
+  }
+}
+
+# Analyze Categorical Variables
+freq_table1 <- table(data$Agency_Name)
+freq_table2 <- table(data$Category)
+
+# Visualize Ratings with a Boxplot
+ggplot(data, aes(x = factor(Sla_in_hours), y = Rating)) +
+  geom_boxplot(fill = "skyblue", color = "black") +
+  labs(title = "Boxplot of Ratings by SLA Hours", x = "SLA in Hours", y = "Rating") +
+  theme_minimal()
+
+# Requests by ZIP Code
+library(stringr)
+data$ZIP <- str_extract(data$Address, "\\b13\\d{3}\\b")
+ggplot(data = data, aes(x = ZIP)) +
+  geom_bar(fill = "blue", color = "black") +
+  theme_minimal() +
+  labs(title = "Frequency of Requests by ZIP Code", x = "ZIP Code", y = "Number of Requests")
+
+# Regression Analysis
+lm_model <- lm(Minutes_to_closed ~ High_Rating + Sla_in_hours + Report_Mobile, data = data)
+summary(lm_model)
+
+# Association Rules Mining
+library(arules)
+transactions <- as(data, "transactions")
+rules <- apriori(transactions, parameter = list(supp = 0.01, conf = 0.5, minlen = 2))
+inspect(head(rules, 10))
+
+# Text Mining
+library(quanteda)
+summary_corpus <- corpus(data$Summary)
+summary_dfm <- dfm(tokens_select(tokens(summary_corpus), stopwords("en"), selection = "remove"))
+textplot_wordcloud(summary_dfm, min_count = 2)
+            </pre>
+        </section>
+
+        <section>
+            <h2>Interactive Shiny App</h2>
+            <p>You can explore the interactive version of this analysis here:</p>
+            <p><a href="https://osayi2002.shinyapps.io/shinyapp/" target="_blank">🔗 Syracuse Service Requests Shiny App</a></p>
         </section>
     </main>
 </body>
