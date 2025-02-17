@@ -19,25 +19,25 @@
         header {
             background: #0073e6;
             color: white;
-            padding: 40px 20px; /* Reduced padding to match proportion */
+            padding: 30px 20px; /* Reduced padding to match smaller title */
             text-align: center;
             border-radius: 8px;
         }
 
-        /* Title Styling */
+        /* Title Styling - Forced Override */
         h1 {
-            font-size: 50px !important; /* Adjusted to match portfolio page */
+            font-size: 40px !important; /* Guarantees smaller title */
             font-weight: bold;
             margin: 0;
-            color: white; 
+            color: white !important; /* Ensures visibility */
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
-            display: block;
+            display: block !important;
         }
 
         /* Subtitle Styling */
         header p {
-            font-size: 16px; /* Slightly smaller for better proportion */
-            margin-top: 8px;
+            font-size: 14px !important; /* Adjusted to fit smaller title */
+            margin-top: 5px;
             font-style: italic;
         }
 
@@ -81,7 +81,7 @@
 </head>
 <body>
     <header>
-        <h1>Syracuse Service Requests Analysis (R)</h1>
+        <h1 style="font-size: 40px !important;">Syracuse Service Requests Analysis (R)</h1>
         <p>Analyzing and visualizing trends in service requests to improve city services.</p>
     </header>
     
