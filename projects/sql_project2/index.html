@@ -4,10 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Premier League Teams Database</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #0044cc;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 24px;
+        }
+        main {
+            max-width: 900px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        section {
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #0044cc;
+            border-bottom: 2px solid #0044cc;
+            padding-bottom: 5px;
+        }
+        ul {
+            list-style-type: square;
+            padding-left: 20px;
+        }
+        p {
+            line-height: 1.6;
+        }
+        .code-container {
+            background: #222;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        img {
+            max-width: 100%;
+            display: block;
+            margin: 10px auto;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 </head>
 <body>
     <header>
-        <h1>Premier League Teams Database</h1>
+        Premier League Teams Database
     </header>
     <main>
         <section>
@@ -15,16 +70,159 @@
             <p>This project involves designing a database for Premier League teams to manage rankings, fanbases, and team details.</p>
         </section>
         <section>
-            <h2>Key Features</h2>
-            <ul>
-                <li>Database with three tables: Teams, Rankings, and Fanbases.</li>
-                <li>Relationships managed using foreign keys for accurate data integrity.</li>
-                <li>Queries to calculate team performance and analyze fanbases.</li>
-            </ul>
+            <h2>Database Schema</h2>
+            <img src="image.png" alt="Premier League Database Schema">
+        </section>
+        <section>
+            <h2>SQL Code</h2>
+            <div class="code-container">
+               --drop constraints--
+ALTER table team_rankings drop constraint fk_team_name_rankings
+Alter table team_fans drop constraint fk_team_points
+alter table team_fans drop constraint fk_team_name_fans
+--drop table--
+drop table premier_league_teams
+drop table team_rankings
+drop table team_fans
+--create table--
+create table premier_league_teams (
+team_name varchar(50) not null,
+team_location varchar (50) not null,
+team_stadium varchar (70) not null
+)
+-- new table--
+create table team_rankings (
+team_points int not null,
+number_of_wins int null,
+number_of_losses int null,
+number_of_draws int null,
+fk_team_name_rankings varchar (50) not null
+)
+-- new table--
+create table team_fans (
+fanbase_name varchar (50) not null,
+total_fans int not null,
+fk_team_points int not null,
+fk_team_name_fans varchar (50) not null
+)
+--Add constraints--
+ALTER table premier_league_teams
+Add constraint Pk_team_name Primary key (team_name)
+
+Alter table team_rankings
+Add constraint Pk_team_points primary key (team_points)
+
+Alter table team_rankings
+Add constraint fk_team_name_rankings foreign key (fk_team_name_rankings) references 
+premier_league_teams (team_name)
+
+Alter table team_fans
+add constraint pk_fanbase_name primary key (fanbase_name)
+
+Alter table team_fans
+add constraint fk_team_name_fans foreign key (fk_team_name_fans) references
+premier_league_teams (team_name)
+
+Alter table team_fans
+add constraint fk_team_points foreign key (fk_team_points) references
+team_rankings (team_points)
+--inserts--
+Insert Into premier_league_teams (
+team_name,
+team_location,
+team_stadium
+) 
+Values 
+('arsenal', 'london', 'emmirates'),
+('liverpool', 'liverpool city', 'anfield'),
+('man city', 'manchester', 'ethiad'),
+('man united','manchester', 'old trafford'),
+('chelsea', 'london', 'stamford bridge'),
+('spurs', 'london', 'spurs stadium')
+
+Insert into team_rankings (
+Team_points,
+number_of_wins,
+number_of_losses,
+number_of_draws,
+fk_team_name_rankings
+)
+Values
+(80, 24, 4, 3,
+(select team_name from premier_league_teams Where team_name = 'arsenal')),
+(77, 23, 5, 3,
+(select team_name from premier_league_teams where team_name = 'liverpool')),
+(75, 23, 5, 2,
+(select team_name from premier_league_teams where team_name = 'man city')),
+(69, 21, 7, 2,
+(select team_name from premier_league_teams where team_name = 'man united')),
+(61, 19, 9, 3,
+(select team_name from premier_league_teams where team_name = 'chelsea')),
+(59, 19, 9, 4,
+(select team_name from premier_league_teams where team_name = 'spurs'))
+
+INSERT INTO team_fans (
+fanbase_name, total_fans, fk_team_points, fk_team_name_fans)
+VALUES
+('Arsenal Fans', 1500000, 80, 'Arsenal'),
+('Liverpool Loyal', 1800000, 77, 'Liverpool'),
+('City Supporters', 1700000, 75, 'Man City'),
+('United Faithful', 2000000, 69, 'Man United'),
+('Chelsea Blue Army', 1400000, 61, 'Chelsea'),
+('Spurs Fan Club', 1300000, 59, 'Spurs');
+
+--select statements practice-- 
+Select * from premier_league_teams
+
+
+select team_name, team_stadium from premier_league_teams where team_location 
+= 'london' 
+
+select team_location, count (team_name) as number_of_teams
+from premier_league_teams
+group by team_location
+order by number_of_teams desc
+
+--joins practice-- 
+select premier_league_teams.team_name, premier_league_teams.team_location,
+premier_league_teams.team_stadium, team_rankings.team_points, team_rankings.number_of_wins,
+team_rankings.number_of_losses, team_rankings.number_of_draws
+from premier_league_teams
+inner join team_rankings on premier_league_teams.team_name = team_rankings.fk_team_name_rankings
+order by team_points desc
+
+select t.team_name, r.team_points,
+r.number_of_wins, r.number_of_losses, 
+r.number_of_draws
+from premier_league_teams as t 
+full join team_rankings as r on t.team_name= r.fk_team_name_rankings
+order by team_points desc
+
+select r.team_points, r.number_of_wins, t.team_location
+from team_rankings as r
+left join premier_league_teams as t on r.fk_team_name_rankings = t.team_name
+
+
+select p.team_name, r.team_points, f.fanbase_name
+from premier_league_teams as p
+inner join team_rankings as r on fk_team_name_rankings = team_name
+inner join team_fans as f on fk_team_name_fans = team_name
+
+--concatenation-- 
+
+SELECT 
+    CONCAT(premier_league_teams.team_name, ' plays at ', premier_league_teams.team_stadium, 
+           ' with a total of ', team_rankings.team_points, ' points.') AS team_description
+FROM 
+    premier_league_teams
+JOIN 
+    team_rankings ON premier_league_teams.team_name = team_rankings.fk_team_name_rankings;
+            </div>
         </section>
         <section>
             <h2>Conclusion</h2>
-            <p>The database helps analyze team rankings, performance metrics, and fan engagement, providing valuable insights into the Premier League.</p>
+            <p>The database helps analyze team rankings, performance metrics, and fan engagement, providing valuable insights into the Premier League. 
+            It showcases how structured data relationships can enhance sports analytics.</p>
         </section>
     </main>
 </body>
