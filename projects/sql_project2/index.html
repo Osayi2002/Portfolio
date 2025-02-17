@@ -53,6 +53,7 @@
         }
         img {
             max-width: 100%;
+            height: auto;
             display: block;
             margin: 10px auto;
             border-radius: 5px;
@@ -71,11 +72,23 @@
         </section>
         <section>
             <h2>Database Schema</h2>
-            <img src="image.png" alt="Premier League Database Schema">
+            <!-- Ensure correct file path -->
+            <img src="./image.png" alt="Premier League Database Schema">
+            <p>If the image does not display, ensure it is in the same directory as this HTML file.</p>
+            <p>If the image is inside a folder (e.g., 'images'), update the src as follows:</p>
+            <pre class="code-container">
+&lt;img src="images/image.png" alt="Premier League Database Schema"&gt;
+            </pre>
+            <p>If running locally, try opening a simple HTTP server using:</p>
+            <pre class="code-container">
+python -m http.server 8000
+            </pre>
+            <p>Then open <a href="http://localhost:8000/" target="_blank">http://localhost:8000/</a> in your browser.</p>
         </section>
         <section>
             <h2>SQL Code</h2>
             <div class="code-container">
+
                --drop constraints--
 ALTER table team_rankings drop constraint fk_team_name_rankings
 Alter table team_fans drop constraint fk_team_points
