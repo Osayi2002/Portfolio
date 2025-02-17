@@ -41,10 +41,6 @@
             font-weight: bold;
             margin-bottom: 10px;
         }
-        ul {
-            list-style-type: square;
-            padding-left: 20px;
-        }
         p {
             line-height: 1.6;
             font-size: 16px;
@@ -69,7 +65,7 @@
     </style>
 </head>
 <body>
- <header>
+    <header>
         Premier League Teams Database
     </header>
     <main>
@@ -178,7 +174,6 @@ VALUES
 --select statements practice-- 
 Select * from premier_league_teams
 
-
 select team_name, team_stadium from premier_league_teams where team_location 
 = 'london' 
 
@@ -206,7 +201,6 @@ select r.team_points, r.number_of_wins, t.team_location
 from team_rankings as r
 left join premier_league_teams as t on r.fk_team_name_rankings = t.team_name
 
-
 select p.team_name, r.team_points, f.fanbase_name
 from premier_league_teams as p
 inner join team_rankings as r on fk_team_name_rankings = team_name
@@ -222,10 +216,6 @@ FROM
 JOIN 
     team_rankings ON premier_league_teams.team_name = team_rankings.fk_team_name_rankings;
             </div>
-        </div>
-        <div class="section-container">
-            <h2>Conclusion</h2>
-            <p>The database helps analyze team rankings, performance metrics, and fan engagement, providing valuable insights into the Premier League.</p>
         </div>
     </main>
 </body>
