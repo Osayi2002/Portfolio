@@ -7,17 +7,18 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #e8f0f8;
             color: #333;
             margin: 0;
             padding: 0;
         }
         header {
-            background-color: #0044cc;
+            background-color: #2a5d84;
             color: white;
             text-align: center;
-            padding: 20px;
-            font-size: 24px;
+            padding: 25px;
+            font-size: 28px;
+            font-weight: bold;
         }
         main {
             max-width: 900px;
@@ -25,15 +26,20 @@
             background: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
-        section {
+        .section-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
             margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         h2 {
-            color: #0044cc;
-            border-bottom: 2px solid #0044cc;
-            padding-bottom: 5px;
+            color: #2a5d84;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
         ul {
             list-style-type: square;
@@ -41,10 +47,11 @@
         }
         p {
             line-height: 1.6;
+            font-size: 16px;
         }
         .code-container {
-            background: #222;
-            color: #0f0;
+            background: #2a2d35;
+            color: #d1f7c4;
             padding: 15px;
             border-radius: 5px;
             font-family: monospace;
@@ -66,33 +73,22 @@
         Premier League Teams Database
     </header>
     <main>
-        <section>
+        <div class="section-container">
             <h2>Overview</h2>
             <p>This project involves designing a database for Premier League teams to manage rankings, fanbases, and team details.</p>
-        </section>
-        <section>
+        </div>
+        <div class="section-container">
             <h2>Database Schema</h2>
-            <!-- Ensure correct file path -->
-            <img src="./image.png" alt="Premier League Database Schema">
+            <img src="Screenshot 2025-02-11 at 10.15.47 PM.png" alt="Premier League Database Schema">
             <p>If the image does not display, ensure it is in the same directory as this HTML file.</p>
             <p>If the image is inside a folder (e.g., 'images'), update the src as follows:</p>
-            <pre class="code-container">
-&lt;img src="images/image.png" alt="Premier League Database Schema"&gt;
-            </pre>
-            <p>If running locally, try opening a simple HTTP server using:</p>
-            <pre class="code-container">
-python -m http.server 8000
-            </pre>
-            <p>Then open <a href="http://localhost:8000/" target="_blank">http://localhost:8000/</a> in your browser.</p>
-        </section>
-        <section>
+            <div class="code-container">
+&lt;img src="images/Screenshot 2025-02-11 at 10.15.47 PM.png" alt="Premier League Database Schema"&gt;
+            </div>
+        </div>
+        <div class="section-container">
             <h2>SQL Code</h2>
             <div class="code-container">
-
-               --drop constraints--
-ALTER table team_rankings drop constraint fk_team_name_rankings
-Alter table team_fans drop constraint fk_team_points
-alter table team_fans drop constraint fk_team_name_fans
 --drop table--
 drop table premier_league_teams
 drop table team_rankings
@@ -231,12 +227,11 @@ FROM
 JOIN 
     team_rankings ON premier_league_teams.team_name = team_rankings.fk_team_name_rankings;
             </div>
-        </section>
-        <section>
+        </div>
+        <div class="section-container">
             <h2>Conclusion</h2>
-            <p>The database helps analyze team rankings, performance metrics, and fan engagement, providing valuable insights into the Premier League. 
-            It showcases how structured data relationships can enhance sports analytics.</p>
-        </section>
+            <p>The database helps analyze team rankings, performance metrics, and fan engagement, providing valuable insights into the Premier League.</p>
+        </div>
     </main>
 </body>
 </html>
