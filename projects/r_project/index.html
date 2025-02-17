@@ -6,14 +6,10 @@
     <title>Syracuse Service Requests Analysis (R)</title>
     <style>
         /* General Page Styling */
-        h1 {
-            font-size: 100px !important;
-            font-weight: bold;
-        }
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
+            margin: 0;
+            padding: 0;
             background-color: #f4f4f4;
             color: #333;
             line-height: 1.6;
@@ -23,21 +19,41 @@
         header {
             background: #0073e6;
             color: white;
-            padding: 20px;
+            padding: 50px 20px; /* Increased padding for a balanced layout */
             text-align: center;
             border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Title Styling */
+        h1 {
+            font-size: 80px; /* Large text size */
+            font-weight: bold;
+            margin: 0; /* Removes unnecessary space */
+            color: white; /* Ensures text is visible */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Enhances contrast */
+        }
+
+        /* Subtitle Styling */
+        header p {
+            font-size: 20px;
+            margin-top: 10px;
+            font-style: italic;
         }
 
         /* Section Styling */
         section {
             background: white;
-            margin: 20px 0;
+            margin: 20px;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        h1, h2 {
+        h2 {
             color: #0073e6;
         }
 
@@ -69,7 +85,7 @@
 <body>
     <header>
         <h1>Syracuse Service Requests Analysis (R)</h1>
-        <p><i>Analyzing and visualizing trends in service requests to improve city services.</i></p>
+        <p>Analyzing and visualizing trends in service requests to improve city services.</p>
     </header>
     
     <main>
