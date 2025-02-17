@@ -4,27 +4,249 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Management Database</title>
-</head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+        header {
+            background: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        main {
+            width: 80%;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #222;
+        }
+        section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-left: 5px solid #007BFF;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        ul {
+            list-style: square;
+            padding-left: 20px;
+        }
+        pre {
+            background: #282c34;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 <body>
     <header>
         <h1>Event Management Database</h1>
     </header>
     <main>
         <section>
-            <h2>Overview</h2>
-            <p>This project involves creating a database to manage event details, including venues, event types, and ticket pricing.</p>
+            <h2>Introduction</h2>
+            <p>
+                This project involves designing a relational database for managing event details, including venues, event types, 
+                and ticket pricing. The database structure ensures data integrity through primary and foreign key constraints, 
+                while complex queries allow for insightful analysis of event trends and financial metrics.
+            </p>
         </section>
+
         <section>
             <h2>Key Features</h2>
             <ul>
                 <li>Normalized database design with three tables: Venues, Events, and Event Types.</li>
                 <li>Foreign key constraints to maintain relationships between entities.</li>
-                <li>Complex queries to calculate statistics and generate reports.</li>
+                <li>Data insertion for multiple event types and venues.</li>
+                <li>SQL queries to generate reports on ticket pricing and event distribution.</li>
             </ul>
         </section>
+
+        <section>
+            <h2>SQL Code</h2>
+            <p>
+                Below is the full SQL script for the Event Management Database. This includes table creation, constraints, data insertion, 
+                and queries for analysis.
+            </p>
+            <pre>
+-- 1.0 NAME --
+-- Osayi Igbinedion --
+
+-- 1.1 DROP ALL --
+
+-- Drop foreign key constraints in a1_events table if they exist
+IF OBJECT_ID('a1_events') IS NOT NULL 
+BEGIN
+    ALTER TABLE a1_events DROP CONSTRAINT IF EXISTS fk_venue_id;
+    ALTER TABLE a1_events DROP CONSTRAINT IF EXISTS fk_event_type;
+    DROP TABLE a1_events;
+END;
+
+-- Drop other tables if they exist
+IF OBJECT_ID('a1_types') IS NOT NULL 
+    DROP TABLE a1_types;
+
+IF OBJECT_ID('a1_venues') IS NOT NULL 
+    DROP TABLE a1_venues;
+
+-- 1.2 Create venue Table -- 
+CREATE TABLE a1_venues (
+    venue_id VARCHAR(10) NOT NULL,
+    venue_name VARCHAR(100) NOT NULL,
+    venue_capacity INT NOT NULL DEFAULT 0,
+    venue_description VARCHAR(200) NULL,
+    venue_cost MONEY NOT NULL,
+    CONSTRAINT pk_venue_id PRIMARY KEY (venue_id)
+);
+
+-- 1.3 CREATE the events table --
+CREATE TABLE a1_events (
+    event_id INT NOT NULL IDENTITY(1,1),
+    event_name VARCHAR(100) NOT NULL,
+    event_date DATE NOT NULL DEFAULT GETDATE(),
+    event_price MONEY NOT NULL DEFAULT 100,
+    fk_venue_id VARCHAR(10) NULL,
+    fk_event_type VARCHAR(50) NOT NULL,
+    CONSTRAINT pk_event_id PRIMARY KEY (event_id)
+);
+
+-- 1.4 Create lookup table for events --
+CREATE TABLE a1_types(
+    event_type VARCHAR(50) NOT NULL,
+    CONSTRAINT pk_event_type PRIMARY KEY (event_type)
+);
+
+-- PART 2 FOREIGN KEY CONSTRAINTS --
+
+-- Foreign Key: Linking a1_events to a1_venues (Venue ID)
+ALTER TABLE a1_events
+ADD CONSTRAINT fk_venue_id FOREIGN KEY (fk_venue_id) REFERENCES a1_venues(venue_id) ON DELETE CASCADE;
+
+-- Foreign Key: Linking a1_events to a1_types (Event Type)
+ALTER TABLE a1_events
+ADD CONSTRAINT fk_event_type FOREIGN KEY (fk_event_type) REFERENCES a1_types(event_type) ON DELETE CASCADE;
+
+-- PART 3 INSERT BASE DATA --
+
+-- 3.1 Insert data into a1_venues --
+INSERT INTO a1_venues (venue_id, venue_name, venue_capacity, venue_description, venue_cost) VALUES 
+    ('RRA', 'Red Rocks Amphitheater', 2525, 'Open-air amphitheatre', CAST(15000.00 AS MONEY)),
+    ('CH-Stern', 'Carnegie Hall Stern Room', 2804, 'Venue for classical and popular music', CAST(14000.00 AS MONEY)),
+    ('DS', 'Dodger Stadium', 56000, 'Baseball stadium in the Elysian Park', CAST(25000.00 AS MONEY)),
+    ('HR', 'Hard Rock Stadium', 65326, 'Home field for the Miami Dolphins', CAST(30000.00 AS MONEY));
+
+-- 3.2 Insert data into a1_types --
+INSERT INTO a1_types (event_type) VALUES 
+    ('country'),
+    ('classical'),
+    ('opera'),
+    ('comedy'),
+    ('pop');
+
+-- 3.3 Insert data into a1_events --
+INSERT INTO a1_events (event_name, event_date, event_price, fk_venue_id, fk_event_type) VALUES
+    ('Lyle Lovett and His Large Band', '2023-10-02 19:30:00', CAST(68.00 AS MONEY), 
+     (SELECT venue_id FROM a1_venues WHERE venue_name = 'Carnegie Hall Stern Room'), 
+     (SELECT event_type FROM a1_types WHERE event_type = 'country')),
+
+    ('John-Henry Crawford, Cello', '2023-10-03 19:30:00', CAST(69.00 AS MONEY), 
+     (SELECT venue_id FROM a1_venues WHERE venue_name = 'Carnegie Hall Stern Room'), 
+     (SELECT event_type FROM a1_types WHERE event_type = 'classical')),
+
+    ('Enrique de Allende', '2023-10-05 20:00:00', CAST(50.00 AS MONEY), 
+     (SELECT venue_id FROM a1_venues WHERE venue_name = 'Carnegie Hall Stern Room'), 
+     (SELECT event_type FROM a1_types WHERE event_type = 'opera')),
+
+    ('Bert Kreischer: Trippin'' at Red Rocks', '2023-10-04 19:30:00', CAST(49.00 AS MONEY), 
+     (SELECT venue_id FROM a1_venues WHERE venue_name = 'Red Rocks Amphitheater'), 
+     (SELECT event_type FROM a1_types WHERE event_type = 'comedy')),
+
+    ('Cody Jinks', '2023-10-07 19:00:00', CAST(74.50 AS MONEY), 
+     (SELECT venue_id FROM a1_venues WHERE venue_name = 'Red Rocks Amphitheater'), 
+     (SELECT event_type FROM a1_types WHERE event_type = 'country')),
+
+    ('Taylor Swift', '2024-10-20 20:00:00', CAST(898.00 AS MONEY),
+     (SELECT venue_id FROM a1_venues WHERE venue_name = 'Hard Rock Stadium'),
+     (SELECT event_type FROM a1_types WHERE event_type = 'pop'));
+
+-- PART 4 REPORTS & QUERIES --
+
+-- 4.1 Find the most expensive ticket and the average ticket price
+SELECT 
+    MAX(event_price) AS most_expensive_ticket_price,
+    AVG(event_price) AS average_ticket_price
+FROM 
+    a1_events;
+
+-- 4.2 Retrieve event details for events happening in October 2023
+SELECT 
+    a1_events.event_id,
+    a1_events.event_name,
+    a1_events.event_date,
+    a1_events.event_price,
+    a1_venues.venue_id,
+    a1_venues.venue_name,
+    a1_venues.venue_capacity,
+    a1_venues.venue_description,
+    a1_venues.venue_cost,
+    a1_types.event_type
+FROM 
+    a1_events
+FULL JOIN 
+    a1_venues ON a1_events.fk_venue_id = a1_venues.venue_id
+FULL JOIN 
+    a1_types ON a1_events.fk_event_type = a1_types.event_type
+WHERE 
+    MONTH(a1_events.event_date) = 10
+    AND YEAR(a1_events.event_date) = 2023;
+
+-- 4.3 Count the number of events for each event type and venue
+SELECT 
+    a1_types.event_type, 
+    a1_venues.venue_name, 
+    COUNT(a1_events.event_id) AS number_events
+FROM 
+    a1_events
+LEFT JOIN 
+    a1_venues ON a1_events.fk_venue_id = a1_venues.venue_id
+LEFT JOIN 
+    a1_types ON a1_events.fk_event_type = a1_types.event_type
+GROUP BY 
+    a1_types.event_type, 
+    a1_venues.venue_name
+ORDER BY 
+    a1_venues.venue_name;
+
+            </pre>
+        </section>
+
         <section>
             <h2>Conclusion</h2>
-            <p>The database provides insights into event management, ticket pricing, and venue details, enhancing the efficiency of event handling.</p>
+            <p>
+                The Event Management Database provides insights into event scheduling, ticket pricing, and venue statistics.
+                By integrating structured queries and relational constraints, it ensures efficient event data management.
+            </p>
         </section>
     </main>
 </body>
