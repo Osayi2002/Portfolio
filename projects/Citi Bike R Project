@@ -223,7 +223,7 @@ shinyApp(ui = ui, server = server)
     <section>
       <h2>Live Shiny App</h2>
       <p>Explore the interactive dashboard here:</p>
-      <p><a href="https://YOUR_USERNAME.shinyapps.io/citi-bike-dashboard" target="_blank">🔗 Citi Bike Shiny App</a></p>
+      <p><a href="https://osayi2002.shinyapps.io/citi-bike-dashboard/" target="_blank">🔗 Citi Bike Shiny App</a></p>
     </section>
   </main>
 </body>
